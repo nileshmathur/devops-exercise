@@ -1,1 +1,1 @@
-# devops-exercise
+# devops-assignment
