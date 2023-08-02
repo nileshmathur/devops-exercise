@@ -1,15 +1,32 @@
-- hosts: localhost
+---
+- name: Install Docker Compose on localhost
+  hosts: localhost
+  become: yes
+
   tasks:
-          - name: Configure yum for Docker
-            yum_repository:
-                    name: "docker"
-                    baseurl: https://download.docker.com/linux/centos/7/x86_64/stable/
-                    description: Docker Repo
-                    gpgcheck: no
-          - name: Install Docker
-            command: "yum install docker -ce -y --nobest"
-          - name: Start Docker Service
-            service:
-                    name: "docker"
-                    state: started
-                    enabled: yes
+    - name: Download Docker Compose binary
+      get_url:
+        url: "https://github.com/docker/compose/releases/latest/download/docker-compose-Linux-x86_64"
+        dest: "/usr/local/bin/docker-compose"
+        mode: '0755'
+      register: download_result
+      until: download_result is succeeded
+      retries: 3
+      delay: 5
+
+    - name: Verify Docker Compose installation
+      stat:
+        path: "/usr/local/bin/docker-compose"
+      register: compose_file_stat
+      until: compose_file_stat.stat.exists
+      retries: 3
+      delay: 5
+
+    - name: Print a message if Docker Compose was installed successfully
+      debug:
+        msg: "Docker Compose has been installed successfully."
+
+    - name: Fail the playbook if Docker Compose installation failed
+      fail:
+        msg: "Failed to install Docker Compose."
+      when: not compose_file_stat.stat.exists
