@@ -13,29 +13,20 @@
         - device-mapper-persistent-data
         - lvm2
 
-    - name: Add Docker repository GPG key
-      shell: rpm --import https://download.docker.com/linux/centos/gpg
+    - name: Download Docker installation script
+      get_url:
+        url: https://get.docker.com/
+        dest: /tmp/get-docker.sh
+        mode: '0755'
+
+    - name: Run Docker installation script
+      shell: /tmp/get-docker.sh
       args:
         executable: /bin/bash
-
-    - name: Add Docker repository
-      yum_repository:
-        name: docker-ce-stable
-        description: Docker CE Stable - $basearch
-        baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
-        gpgcheck: yes
-        gpgkey: https://download.docker.com/linux/centos/gpg
-        enabled: yes
-
-    - name: Install Docker 
-      yum:
-        name: "{{ item }}"
-        state: latest
-      with_items:
-        - docker-ce
-        - docker-ce-rootless-extras
-        - fuse-overlayfs
-        - slirp4netns
+      register: docker_install_result
+      until: docker_install_result.rc == 0
+      retries: 3
+      delay: 5
 
     - name: Start and enable Docker service
       service:
