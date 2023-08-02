@@ -27,10 +27,15 @@
         gpgkey: https://download.docker.com/linux/centos/gpg
         enabled: yes
 
-    - name: Install Docker
+    - name: Install Docker 
       yum:
-        name: docker-ce
+        name: "{{ item }}"
         state: latest
+      with_items:
+        - docker-ce
+        - docker-ce-rootless-extras
+        - fuse-overlayfs
+        - slirp4netns
 
     - name: Start and enable Docker service
       service:
