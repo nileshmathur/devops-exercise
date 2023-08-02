@@ -130,7 +130,7 @@ resource "aws_instance" "mern_os" {
     security_groups	 	= [aws_security_group.mern_sg.id ,]             
     subnet_id       	= aws_subnet.mern_subnet.id
 
-    provisioner "script" {
+    provisioner "file" {
 		source = "script.sh"
 		destination = "/script.sh"
 	
