@@ -40,12 +40,6 @@
         groups: docker
         append: yes
 
-    - name: Install Docker Compose
-      pip:
-        name: docker-compose
-        state: present
-        executable: pip3
-
     - name: Start and enable Docker service
       service:
         name: docker
