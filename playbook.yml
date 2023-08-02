@@ -14,7 +14,7 @@
         - lvm2
 
     - name: Add Docker repository GPG key
-      shell: curl -fsSL https://download.docker.com/linux/amazon/gpg | gpg --dearmor -o /etc/pki/rpm-gpg/RPM-GPG-KEY-docker
+      shell: rpm --import https://download.docker.com/linux/centos/gpg
       args:
         executable: /bin/bash
 
@@ -24,7 +24,7 @@
         description: Docker CE Stable - $basearch
         baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
         gpgcheck: yes
-        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-docker
+        gpgkey: https://download.docker.com/linux/centos/gpg
         enabled: yes
 
     - name: Install Docker
