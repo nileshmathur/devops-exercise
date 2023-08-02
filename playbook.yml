@@ -13,10 +13,24 @@
         - device-mapper-persistent-data
         - lvm2
 
-    - name: Add Docker repository
-      shell: amazon-linux-extras install docker
+    - name: Add Docker repository GPG key
+      shell: curl -fsSL https://download.docker.com/linux/amazon/gpg | gpg --dearmor -o /etc/pki/rpm-gpg/RPM-GPG-KEY-docker
       args:
         executable: /bin/bash
+
+    - name: Add Docker repository
+      yum_repository:
+        name: docker-ce-stable
+        description: Docker CE Stable - $basearch
+        baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
+        gpgcheck: yes
+        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-docker
+        enabled: yes
+
+    - name: Install Docker
+      yum:
+        name: docker-ce
+        state: latest
 
     - name: Start and enable Docker service
       service:
