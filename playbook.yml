@@ -1,5 +1,31 @@
 ---
-- hosts: localhost
+- name: Setting up Docker Environment for MERN Stack Application
+  hosts: localhost
   tasks:
-  - name: Ping
+  - name: Pinging localhost
     ping:
+  - name: Installing docker packages
+    apt:
+      name: ['apt-transport-https','ca-certificates', 'curl', 'software-properties-common']
+      state: present
+  - name: Adding Docker GPG key
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+  - name: Adding Docker repo
+    apt_repository:
+      repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable
+      state: present
+  - name: Updating apt packages
+    apt:
+        update_cache: yes
+  - name: Installing Docker
+    apt:
+      name: docker-ce
+      state: present
+      update_cache: yes
+  - name: Installing Docker-Compose
+    get_url:
+      url: https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
+      dest: /usr/local/bin/docker-compose
+      mode: 'u+x,g+x'
