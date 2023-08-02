@@ -6,7 +6,7 @@
     ping:
   - name: Installing docker packages
     apt:
-      name: ['apt-transport-https','ca-certificates', 'curl', 'software-properties-common']
+      name: name: ['apt-transport-https','ca-certificates', 'curl', 'software-properties-common']
       state: present
   - name: Adding Docker GPG key
     apt_key:
