@@ -1,47 +1,32 @@
 ---
-- name: Install Docker and Docker Compose
+- name: Install Docker Compose on localhost
   hosts: localhost
-  gather_facts: true
-  become: true
+  become: yes
 
   tasks:
-    - name: Update apt cache
-      apt:
-        update_cache: yes
-      changed_when: false
+    - name: Download Docker Compose binary
+      get_url:
+        url: "https://github.com/docker/compose/releases/latest/download/docker-compose-Linux-x86_64"
+        dest: "/usr/local/bin/docker-compose"
+        mode: '0755'
+      register: download_result
+      until: download_result is succeeded
+      retries: 3
+      delay: 5
 
-    - name: Install dependencies
-      apt:
-        name:
-          - apt-transport-https
-          - ca-certificates
-          - curl
-          - software-properties-common
-        state: present
+    - name: Verify Docker Compose installation
+      stat:
+        path: "/usr/local/bin/docker-compose"
+      register: compose_file_stat
+      until: compose_file_stat.stat.exists
+      retries: 3
+      delay: 5
 
-    - name: Add Docker GPG key
-      apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
+    - name: Print a message if Docker Compose was installed successfully
+      debug:
+        msg: "Docker Compose has been installed successfully."
 
-    - name: Add Docker repository
-      apt_repository:
-        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable"
-        state: present
-
-    - name: Install Docker
-      apt:
-        name: docker-ce
-        state: present
-
-    - name: Add current user to docker group
-      user:
-        name: "{{ ansible_user }}"
-        groups: docker
-        append: yes
-
-    - name: Start and enable Docker service
-      service:
-        name: docker
-        state: started
-        enabled: yes
+    - name: Fail the playbook if Docker Compose installation failed
+      fail:
+        msg: "Failed to install Docker Compose."
+      when: not compose_file_stat.stat.exists
