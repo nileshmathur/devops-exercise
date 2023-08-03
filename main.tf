@@ -67,9 +67,10 @@ resource "aws_route_table_association" "mern_subnet_rt" {
 resource "aws_security_group" "mern_sg" {
   depends_on = [aws_vpc.mern_vpc, ]
 
-  name        = "sg_allow"
+  name        = "mern_sg_allow"
   description = "https and ssh"
   vpc_id      = aws_vpc.mern_vpc.id
+  
 
   # Creating Security Group
   ingress {
@@ -93,6 +94,13 @@ resource "aws_security_group" "mern_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 0
+    to_port     = 65535  
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
 
   egress {
     from_port   = 0
@@ -103,7 +111,7 @@ resource "aws_security_group" "mern_sg" {
 
 
   tags = {
-    Name = "sg_allow"
+    Name = "mern_sg_allow"
   }
 }
 
